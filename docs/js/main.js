@@ -107,48 +107,48 @@ $(function () {
             if (value === 0) {
                 circle.setText('');
             } else {
-                circle.setText(value);
+                circle.setText("  5/5 ");
             }
         }
     });
 
     bar.animate(1);
 
-    // var bar = new ProgressBar.Circle(circleprog2, {
-    //     strokeWidth: 7,
-    //     easing: 'easeInOut',
-    //     duration: 1400,
-    //     delay: 2700,
-    //     trailWidth: 7,
-    //     step: function(state, circle) {
-    //         var value = Math.round(circle.value() * 100);
-    //         if (value === 0) {
-    //             circle.setText('');
-    //         } else {
-    //             circle.setText(value);
-    //         }
-    //     }
-    // });
+    var bar = new ProgressBar.Circle(circleprog2, {
+        strokeWidth: 7,
+        easing: 'easeInOut',
+        duration: 1400,
+        delay: 2700,
+        trailWidth: 7,
+        step: function (state, circle) {
+            var value = Math.round(circle.value() * 100);
+            if (value === 0) {
+                circle.setText('');
+            } else {
+                circle.setText("< 24 hr");
+            }
+        }
+    });
 
-    // bar.animate(1);
+    bar.animate(1);
 
-    // var bar = new ProgressBar.Circle(circleprog3, {
-    //     strokeWidth: 7,
-    //     easing: 'easeInOut',
-    //     duration: 1400,
-    //     delay: 2900,
-    //     trailWidth: 7,
-    //     step: function(state, circle) {
-    //         var value = Math.round(circle.value() * 100);
-    //         if (value === 0) {
-    //             circle.setText('');
-    //         } else {
-    //             circle.setText(value);
-    //         }
-    //     }
-    // });
+    var bar = new ProgressBar.Circle(circleprog3, {
+        strokeWidth: 7,
+        easing: 'easeInOut',
+        duration: 1400,
+        delay: 2900,
+        trailWidth: 7,
+        step: function (state, circle) {
+            var value = Math.round(circle.value() * 98);
+            if (value === 0) {
+                circle.setText('');
+            } else {
+                circle.setText("24 Hr");
+            }
+        }
+    });
 
-    // bar.animate(1);
+    bar.animate(1);
 
     var bar = new ProgressBar.Line(lineprog1, {
         strokeWidth: 1.72,
