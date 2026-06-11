@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#2B2B35">
+    <link rel="shortcut icon" href="../img/testimonials/Jenil-round.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/plugins/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/plugins/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/color-1.css">
+
+    <title>Deploying Node.js to AWS Elastic Beanstalk with SSL and CI/CD | Jenil Narola</title>
+    <meta name="description" content="Complete guide to deploying a Node.js application on AWS Elastic Beanstalk with auto scaling, SSL via ACM, custom domain via Route 53, and automated CI/CD using GitHub Actions.">
+    <meta name="author" content="Jenil Narola">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jenilnarola.ca/articles/nodejs-aws-beanstalk-ssl-cicd.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://jenilnarola.ca/articles/nodejs-aws-beanstalk-ssl-cicd.html">
+    <meta property="og:title" content="Deploying Node.js to AWS Elastic Beanstalk with SSL and CI/CD">
+    <meta property="og:description" content="Complete guide to deploying a Node.js app on AWS Elastic Beanstalk with auto scaling, SSL, custom domain, and GitHub Actions CI/CD.">
+    <meta property="og:image" content="https://jenilnarola.ca/img/testimonials/JENIL_NAROLA.png">
+    <meta property="og:site_name" content="Jenil Narola">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Deploying Node.js to AWS Elastic Beanstalk with SSL and CI/CD",
+      "description": "Complete guide to deploying a Node.js application on AWS Elastic Beanstalk with auto scaling, SSL via ACM, custom domain via Route 53, and automated CI/CD using GitHub Actions.",
+      "author": {
+        "@type": "Person",
+        "name": "Jenil Narola",
+        "url": "https://jenilnarola.ca",
+        "jobTitle": "Full Stack & AI Developer"
+      },
+      "datePublished": "2026-05-15",
+      "dateModified": "2026-06-11",
+      "publisher": { "@type": "Person", "name": "Jenil Narola", "url": "https://jenilnarola.ca" },
+      "url": "https://jenilnarola.ca/articles/nodejs-aws-beanstalk-ssl-cicd.html",
+      "mainEntityOfPage": "https://jenilnarola.ca/articles/nodejs-aws-beanstalk-ssl-cicd.html",
+      "keywords": ["AWS", "Elastic Beanstalk", "Node.js", "SSL", "CI/CD", "GitHub Actions", "Route 53", "Auto Scaling"]
+    }
+    </script>
+
+    <style>
+        body { background: #2b2b35; color: rgba(255,255,255,0.78); font-family: 'DM Sans', sans-serif; }
+        .art-article-nav { background: #35353f; padding: 14px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .art-article-nav a { color: #F1B608; text-decoration: none; font-size: 0.9rem; }
+        .art-article-nav a:hover { text-decoration: underline; }
+        .art-article-wrap { max-width: 820px; margin: 0 auto; padding: 50px 24px 80px; }
+        .art-article-header { margin-bottom: 40px; }
+        .art-article-header h1 { font-size: 2rem; color: #fff; line-height: 1.35; margin-bottom: 14px; }
+        .art-article-meta { font-size: 0.82rem; color: rgba(255,255,255,0.45); }
+        .art-article-meta span { margin-right: 18px; }
+        .art-article-meta i { margin-right: 5px; color: #F1B608; }
+        h2 { font-size: 1.3rem; color: #fff; margin-top: 40px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        h3 { font-size: 1.05rem; color: rgba(255,255,255,0.9); margin-top: 28px; margin-bottom: 10px; }
+        p { line-height: 1.8; margin-bottom: 16px; }
+        pre { background: #1a1a24; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 20px 0; }
+        code { font-family: 'Courier New', monospace; font-size: 0.875rem; color: #e8c96d; }
+        pre code { color: rgba(255,255,255,0.82); }
+        .inline-code { background: #1a1a24; border-radius: 3px; padding: 2px 7px; font-family: monospace; font-size: 0.875em; color: #e8c96d; }
+        ul, ol { line-height: 1.9; padding-left: 22px; margin-bottom: 16px; }
+        .art-tag { display: inline-block; background: rgba(241,182,8,0.12); color: #F1B608; border-radius: 4px; padding: 2px 10px; font-size: 0.78rem; margin-right: 6px; margin-bottom: 6px; }
+        .art-callout { background: rgba(241,182,8,0.08); border-left: 3px solid #F1B608; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 24px 0; }
+        .art-callout p { margin-bottom: 0; }
+        .art-step { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 18px 20px; margin: 16px 0; }
+        .art-step h3 { margin-top: 0; }
+        footer { text-align: center; padding: 30px; font-size: 0.82rem; color: rgba(255,255,255,0.35); border-top: 1px solid rgba(255,255,255,0.06); }
+        footer a { color: #F1B608; }
+    </style>
+</head>
+<body>
+
+<nav class="art-article-nav">
+    <a href="https://jenilnarola.ca"><i class="fas fa-arrow-left"></i> Back to Portfolio</a>
+    <a href="mailto:jenilnarola@gmail.com"><i class="fas fa-envelope"></i> Hire Me</a>
+</nav>
+
+<div class="art-article-wrap">
+
+    <div class="art-article-header">
+        <div style="margin-bottom:14px;">
+            <span class="art-tag">AWS</span>
+            <span class="art-tag">Elastic Beanstalk</span>
+            <span class="art-tag">Node.js</span>
+            <span class="art-tag">CI/CD</span>
+            <span class="art-tag">SSL</span>
+        </div>
+        <h1>Deploying Node.js to AWS Elastic Beanstalk with SSL, Auto Scaling, and GitHub Actions CI/CD</h1>
+        <div class="art-article-meta">
+            <span><i class="fas fa-user"></i> Jenil Narola</span>
+            <span><i class="fas fa-calendar"></i> May 15, 2026</span>
+            <span><i class="fas fa-clock"></i> 10 min read</span>
+        </div>
+    </div>
+
+    <p>AWS Elastic Beanstalk is one of the fastest ways to get a Node.js application running in a production-grade environment with load balancing, auto scaling, health monitoring, and managed OS updates — without managing EC2 instances directly. In this guide I'll walk through the full setup: deploying the app, attaching a custom domain with SSL, and wiring up automated deployments via GitHub Actions.</p>
+
+    <div class="art-callout">
+        <p><strong>Prerequisites:</strong> AWS account, Node.js app, domain registered in Route 53 or transferable to it, GitHub repository, AWS CLI installed.</p>
+    </div>
+
+    <h2>1. Prepare Your Node.js App</h2>
+    <p>Elastic Beanstalk expects your app to listen on the port exposed by the <span class="inline-code">PORT</span> environment variable (it injects this automatically).</p>
+    <pre><code>// server.js
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));</code></pre>
+
+    <p>Ensure your <span class="inline-code">package.json</span> has a start script:</p>
+    <pre><code>{
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}</code></pre>
+
+    <div class="art-callout">
+        <p><strong>Important:</strong> Add <span class="inline-code">node_modules/</span> to <span class="inline-code">.gitignore</span>. Beanstalk runs <span class="inline-code">npm install</span> on deploy — don't include node_modules in your zip.</p>
+    </div>
+
+    <h2>2. Create the Elastic Beanstalk Application</h2>
+
+    <div class="art-step">
+        <h3>Via AWS Console</h3>
+        <ol>
+            <li>Go to <strong>Elastic Beanstalk → Create Application</strong></li>
+            <li>Platform: <strong>Node.js</strong>, choose the latest branch</li>
+            <li>Application code: upload a zip of your project (without node_modules)</li>
+            <li>Presets: choose <strong>High availability</strong> (this enables load balancer + auto scaling)</li>
+        </ol>
+    </div>
+
+    <div class="art-step">
+        <h3>Via EB CLI (recommended)</h3>
+        <pre><code>npm install -g aws-elastic-beanstalk-cli  # if not installed
+eb init my-node-app --platform node.js --region ca-central-1
+eb create production --elb-type application
+eb open</code></pre>
+    </div>
+
+    <h2>3. Configure Environment Variables</h2>
+    <p>Never hard-code secrets. Set them as Beanstalk environment properties:</p>
+    <pre><code>eb setenv NODE_ENV=production \
+  DATABASE_URL=postgresql://... \
+  JWT_SECRET=your-secret \
+  OPENAI_API_KEY=sk-...</code></pre>
+    <p>Or via Console: <strong>Configuration → Software → Environment properties</strong>. These are injected as <span class="inline-code">process.env.*</span> at runtime.</p>
+
+    <h2>4. Request an SSL Certificate with ACM</h2>
+    <ol>
+        <li>Open <strong>AWS Certificate Manager → Request certificate</strong></li>
+        <li>Enter your domain: <span class="inline-code">api.yourdomain.com</span> (and optionally <span class="inline-code">*.yourdomain.com</span>)</li>
+        <li>Choose <strong>DNS validation</strong> → click Request</li>
+        <li>ACM shows a CNAME record — add it to Route 53 (there's a one-click "Create records in Route 53" button)</li>
+        <li>Wait ~2 minutes for validation status to turn <strong>Issued</strong></li>
+    </ol>
+
+    <h2>5. Attach SSL to the Load Balancer</h2>
+    <ol>
+        <li>In Beanstalk: <strong>Configuration → Load Balancer → Edit</strong></li>
+        <li>Add a listener: Port <strong>443</strong>, Protocol <strong>HTTPS</strong>, SSL certificate → select your ACM cert</li>
+        <li>Set the HTTP (port 80) listener to <strong>redirect to HTTPS</strong></li>
+        <li>Apply changes — Beanstalk rolls out with no downtime</li>
+    </ol>
+
+    <h2>6. Point Your Custom Domain in Route 53</h2>
+    <pre><code># Route 53 → Hosted Zone → Create Record
+Name:    api.yourdomain.com
+Type:    A (Alias)
+Target:  Alias to Elastic Beanstalk environment → select your env</code></pre>
+    <p>Using an Alias A record (not CNAME) avoids extra DNS lookups and works at the zone apex (<span class="inline-code">yourdomain.com</span>).</p>
+
+    <h2>7. Configure Auto Scaling</h2>
+    <p>In Beanstalk: <strong>Configuration → Capacity → Edit</strong></p>
+    <pre><code>Environment type: Load balanced
+Min instances:    2
+Max instances:    6
+
+Scaling trigger:
+  Metric:       CPUUtilization
+  Upper:        70%  → scale out
+  Lower:        30%  → scale in
+  Period:       5 minutes</code></pre>
+    <p>Two minimum instances ensures high availability across two Availability Zones. The load balancer health check endpoint (<span class="inline-code">/health</span>) should return HTTP 200 within 10 seconds or Beanstalk will replace the instance.</p>
+
+    <h2>8. Automated Deployments with GitHub Actions</h2>
+    <p>Create <span class="inline-code">.github/workflows/deploy.yml</span>:</p>
+    <pre><code>name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & test
+        run: |
+          npm ci
+          npm test
+
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x "*.git*" -x "node_modules/*"
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: my-node-app
+          environment_name: production
+          region: ca-central-1
+          version_label: ${{ github.sha }}
+          deployment_package: deploy.zip</code></pre>
+
+    <p>Add <span class="inline-code">AWS_ACCESS_KEY_ID</span> and <span class="inline-code">AWS_SECRET_ACCESS_KEY</span> as GitHub repository secrets. Use an IAM user with only <span class="inline-code">AWSElasticBeanstalkFullAccess</span> — never use root credentials in CI.</p>
+
+    <h2>Common Issues & Fixes</h2>
+    <ul>
+        <li><strong>502 Bad Gateway:</strong> Your app isn't listening on <span class="inline-code">process.env.PORT</span>. Beanstalk's nginx proxy forwards to that port.</li>
+        <li><strong>Deployment timeout:</strong> Increase the deployment timeout in Configuration → Rolling updates and deployments.</li>
+        <li><strong>Environment variables missing:</strong> They're not passed to child processes by default — use <span class="inline-code">dotenv</span> only locally, rely on Beanstalk properties in production.</li>
+        <li><strong>Health check failing:</strong> Ensure <span class="inline-code">/</span> or your configured health path returns 200 quickly without authentication.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>You now have a Node.js app running on Elastic Beanstalk with HTTPS, a custom domain, auto scaling across multiple AZs, and zero-downtime deployments triggered on every push to main. This is the exact stack I've used across multiple production projects handling thousands of daily requests.</p>
+
+    <p>Need help setting up your AWS infrastructure? <a href="mailto:jenilnarola@gmail.com" style="color:#F1B608;">Get in touch</a> or <a href="https://www.upwork.com/freelancers/~01847efbf9829d2ab3" target="_blank" style="color:#F1B608;">hire me on Upwork</a>.</p>
+
+</div>
+
+<footer>
+    <p>Written by <a href="https://jenilnarola.ca">Jenil Narola</a> — Full Stack & AI Developer, Toronto, ON · <a href="https://jenilnarola.ca">View Portfolio</a></p>
+</footer>
+
+</body>
+</html>

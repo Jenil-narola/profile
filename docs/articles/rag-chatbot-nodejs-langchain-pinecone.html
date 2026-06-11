@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#2B2B35">
+    <link rel="shortcut icon" href="../img/testimonials/Jenil-round.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/plugins/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/plugins/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/color-1.css">
+
+    <title>How to Build a RAG Chatbot with Node.js, LangChain, and Pinecone | Jenil Narola</title>
+    <meta name="description" content="Step-by-step guide to building a production-ready RAG (Retrieval-Augmented Generation) chatbot using Node.js, LangChain, Pinecone vector database, and OpenAI embeddings.">
+    <meta name="author" content="Jenil Narola">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jenilnarola.ca/articles/rag-chatbot-nodejs-langchain-pinecone.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://jenilnarola.ca/articles/rag-chatbot-nodejs-langchain-pinecone.html">
+    <meta property="og:title" content="How to Build a RAG Chatbot with Node.js, LangChain, and Pinecone">
+    <meta property="og:description" content="Step-by-step guide to building a production-ready RAG chatbot using Node.js, LangChain, Pinecone, and OpenAI embeddings.">
+    <meta property="og:image" content="https://jenilnarola.ca/img/testimonials/JENIL_NAROLA.png">
+    <meta property="og:site_name" content="Jenil Narola">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "How to Build a RAG Chatbot with Node.js, LangChain, and Pinecone",
+      "description": "Step-by-step guide to building a production-ready RAG chatbot using Node.js, LangChain, Pinecone vector database, and OpenAI embeddings.",
+      "author": {
+        "@type": "Person",
+        "name": "Jenil Narola",
+        "url": "https://jenilnarola.ca",
+        "jobTitle": "Full Stack & AI Developer"
+      },
+      "datePublished": "2026-06-01",
+      "dateModified": "2026-06-11",
+      "publisher": { "@type": "Person", "name": "Jenil Narola", "url": "https://jenilnarola.ca" },
+      "url": "https://jenilnarola.ca/articles/rag-chatbot-nodejs-langchain-pinecone.html",
+      "mainEntityOfPage": "https://jenilnarola.ca/articles/rag-chatbot-nodejs-langchain-pinecone.html",
+      "keywords": ["RAG", "Node.js", "LangChain", "Pinecone", "OpenAI", "Chatbot", "Vector Database", "AI"]
+    }
+    </script>
+
+    <style>
+        body { background: #2b2b35; color: rgba(255,255,255,0.78); font-family: 'DM Sans', sans-serif; }
+        .art-article-nav { background: #35353f; padding: 14px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .art-article-nav a { color: #F1B608; text-decoration: none; font-size: 0.9rem; }
+        .art-article-nav a:hover { text-decoration: underline; }
+        .art-article-wrap { max-width: 820px; margin: 0 auto; padding: 50px 24px 80px; }
+        .art-article-header { margin-bottom: 40px; }
+        .art-article-header h1 { font-size: 2rem; color: #fff; line-height: 1.35; margin-bottom: 14px; }
+        .art-article-meta { font-size: 0.82rem; color: rgba(255,255,255,0.45); }
+        .art-article-meta span { margin-right: 18px; }
+        .art-article-meta i { margin-right: 5px; color: #F1B608; }
+        h2 { font-size: 1.3rem; color: #fff; margin-top: 40px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        h3 { font-size: 1.05rem; color: rgba(255,255,255,0.9); margin-top: 28px; margin-bottom: 10px; }
+        p { line-height: 1.8; margin-bottom: 16px; }
+        pre { background: #1a1a24; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 20px 0; }
+        code { font-family: 'Courier New', monospace; font-size: 0.875rem; color: #e8c96d; }
+        pre code { color: rgba(255,255,255,0.82); }
+        .inline-code { background: #1a1a24; border-radius: 3px; padding: 2px 7px; font-family: monospace; font-size: 0.875em; color: #e8c96d; }
+        ul, ol { line-height: 1.9; padding-left: 22px; margin-bottom: 16px; }
+        .art-tag { display: inline-block; background: rgba(241,182,8,0.12); color: #F1B608; border-radius: 4px; padding: 2px 10px; font-size: 0.78rem; margin-right: 6px; margin-bottom: 6px; }
+        .art-callout { background: rgba(241,182,8,0.08); border-left: 3px solid #F1B608; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 24px 0; }
+        .art-callout p { margin-bottom: 0; }
+        footer { text-align: center; padding: 30px; font-size: 0.82rem; color: rgba(255,255,255,0.35); border-top: 1px solid rgba(255,255,255,0.06); }
+        footer a { color: #F1B608; }
+    </style>
+</head>
+<body>
+
+<nav class="art-article-nav">
+    <a href="https://jenilnarola.ca"><i class="fas fa-arrow-left"></i> Back to Portfolio</a>
+    <a href="mailto:jenilnarola@gmail.com"><i class="fas fa-envelope"></i> Hire Me</a>
+</nav>
+
+<div class="art-article-wrap">
+
+    <div class="art-article-header">
+        <div style="margin-bottom:14px;">
+            <span class="art-tag">Node.js</span>
+            <span class="art-tag">LangChain</span>
+            <span class="art-tag">Pinecone</span>
+            <span class="art-tag">RAG</span>
+            <span class="art-tag">OpenAI</span>
+        </div>
+        <h1>How to Build a RAG Chatbot with Node.js, LangChain, and Pinecone</h1>
+        <div class="art-article-meta">
+            <span><i class="fas fa-user"></i> Jenil Narola</span>
+            <span><i class="fas fa-calendar"></i> June 1, 2026</span>
+            <span><i class="fas fa-clock"></i> 8 min read</span>
+        </div>
+    </div>
+
+    <p>RAG (Retrieval-Augmented Generation) lets you ground an LLM's answers in your own data — documents, databases, knowledge bases — instead of relying solely on its training. In this guide I'll walk through building a production-grade RAG chatbot using <strong>Node.js</strong>, <strong>LangChain.js</strong>, <strong>Pinecone</strong> as the vector store, and <strong>OpenAI</strong> for embeddings and generation.</p>
+
+    <div class="art-callout">
+        <p><strong>What you'll build:</strong> An Express API endpoint that accepts a user question, retrieves the most relevant document chunks from Pinecone, and streams a grounded answer back from GPT-4o.</p>
+    </div>
+
+    <h2>1. Architecture Overview</h2>
+    <p>The RAG pipeline has two phases:</p>
+    <ul>
+        <li><strong>Ingestion:</strong> Split documents → generate embeddings → upsert to Pinecone.</li>
+        <li><strong>Query:</strong> Embed the user question → query Pinecone for top-K chunks → pass chunks + question to GPT-4o → stream the response.</li>
+    </ul>
+
+    <h2>2. Project Setup</h2>
+    <pre><code>mkdir rag-chatbot && cd rag-chatbot
+npm init -y
+npm install express @langchain/openai @langchain/pinecone @pinecone-database/pinecone langchain dotenv</code></pre>
+
+    <p>Create a <span class="inline-code">.env</span> file:</p>
+    <pre><code>OPENAI_API_KEY=sk-...
+PINECONE_API_KEY=...
+PINECONE_INDEX=rag-index</code></pre>
+
+    <h2>3. Ingest Documents into Pinecone</h2>
+    <p>This script loads text files, splits them into chunks, generates embeddings, and upserts them into Pinecone.</p>
+    <pre><code>// ingest.js
+import { PineconeStore } from "@langchain/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { readFileSync } from "fs";
+
+const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+const index = pc.index(process.env.PINECONE_INDEX);
+
+const rawText = readFileSync("./data/knowledge-base.txt", "utf-8");
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 1000,
+  chunkOverlap: 150,
+});
+
+const docs = await splitter.createDocuments([rawText]);
+
+const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
+
+await PineconeStore.fromDocuments(docs, embeddings, {
+  pineconeIndex: index,
+  namespace: "default",
+});
+
+console.log(`Upserted ${docs.length} chunks to Pinecone.`);</code></pre>
+
+    <h2>4. Build the RAG Query Chain</h2>
+    <pre><code>// rag.js
+import { ChatOpenAI } from "@langchain/openai";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { createRetrievalChain } from "langchain/chains/retrieval";
+import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+
+const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+const index = pc.index(process.env.PINECONE_INDEX);
+
+const vectorStore = await PineconeStore.fromExistingIndex(
+  new OpenAIEmbeddings({ model: "text-embedding-3-small" }),
+  { pineconeIndex: index, namespace: "default" }
+);
+
+const retriever = vectorStore.asRetriever({ k: 5 });
+
+const llm = new ChatOpenAI({ model: "gpt-4o", streaming: true });
+
+const prompt = ChatPromptTemplate.fromTemplate(`
+You are a helpful assistant. Answer the question based only on the context below.
+If the answer is not in the context, say "I don't have that information."
+
+Context:
+{context}
+
+Question: {input}
+`);
+
+const documentChain = await createStuffDocumentsChain({ llm, prompt });
+export const ragChain = await createRetrievalChain({ retriever, combineDocsChain: documentChain });</code></pre>
+
+    <h2>5. Express API with Streaming</h2>
+    <pre><code>// server.js
+import express from "express";
+import "dotenv/config";
+import { ragChain } from "./rag.js";
+
+const app = express();
+app.use(express.json());
+
+app.post("/chat", async (req, res) => {
+  const { question } = req.body;
+  if (!question) return res.status(400).json({ error: "question is required" });
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const stream = await ragChain.stream({ input: question });
+
+  for await (const chunk of stream) {
+    if (chunk.answer) {
+      res.write(`data: ${JSON.stringify({ text: chunk.answer })}\n\n`);
+    }
+  }
+
+  res.write("data: [DONE]\n\n");
+  res.end();
+});
+
+app.listen(3000, () => console.log("RAG server running on port 3000"));</code></pre>
+
+    <h2>6. Testing the Endpoint</h2>
+    <pre><code>curl -X POST http://localhost:3000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What are the refund policies?"}'</code></pre>
+
+    <h2>Production Considerations</h2>
+    <ul>
+        <li><strong>Namespace isolation:</strong> Use separate Pinecone namespaces per tenant or document set.</li>
+        <li><strong>Re-ranking:</strong> Add a Cohere re-ranker step after retrieval to improve relevance before passing to the LLM.</li>
+        <li><strong>Metadata filters:</strong> Add document metadata (date, source, category) to Pinecone and filter at query time.</li>
+        <li><strong>Prompt caching:</strong> If using Claude instead of GPT-4o, use Anthropic's prompt caching to cut costs on repeated system prompts by up to 90%.</li>
+        <li><strong>Rate limiting:</strong> Add express-rate-limit around the <span class="inline-code">/chat</span> endpoint to prevent abuse.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>You now have a streaming RAG chatbot backed by Pinecone vector search. The same pattern scales to hundreds of thousands of documents by using Pinecone's serverless tier and batching your ingestion pipeline. For enterprise deployments I recommend adding a Redis cache layer for frequently asked questions to reduce OpenAI API costs significantly.</p>
+
+    <p>Need help building a RAG system for your product? <a href="mailto:jenilnarola@gmail.com" style="color:#F1B608;">Get in touch</a> or <a href="https://www.upwork.com/freelancers/~01847efbf9829d2ab3" target="_blank" style="color:#F1B608;">hire me on Upwork</a>.</p>
+
+</div>
+
+<footer>
+    <p>Written by <a href="https://jenilnarola.ca">Jenil Narola</a> — Full Stack & AI Developer, Toronto, ON · <a href="https://jenilnarola.ca">View Portfolio</a></p>
+</footer>
+
+</body>
+</html>

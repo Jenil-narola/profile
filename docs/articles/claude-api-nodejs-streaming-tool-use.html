@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#2B2B35">
+    <link rel="shortcut icon" href="../img/testimonials/Jenil-round.png" type="image/x-icon">
+    <link rel="stylesheet" href="../css/plugins/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/plugins/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/color-1.css">
+
+    <title>Claude AI API in Node.js: Streaming, Tool Use & Prompt Caching | Jenil Narola</title>
+    <meta name="description" content="Practical guide to integrating Anthropic's Claude API into a Node.js backend. Covers streaming responses, tool use (function calling), prompt caching, and production best practices.">
+    <meta name="author" content="Jenil Narola">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jenilnarola.ca/articles/claude-api-nodejs-streaming-tool-use.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://jenilnarola.ca/articles/claude-api-nodejs-streaming-tool-use.html">
+    <meta property="og:title" content="Claude AI API in Node.js: Streaming, Tool Use & Prompt Caching">
+    <meta property="og:description" content="Practical guide to integrating Anthropic Claude API into Node.js. Covers streaming, tool use, prompt caching, and production tips.">
+    <meta property="og:image" content="https://jenilnarola.ca/img/testimonials/JENIL_NAROLA.png">
+    <meta property="og:site_name" content="Jenil Narola">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Claude AI API in Node.js: Streaming, Tool Use & Prompt Caching",
+      "description": "Practical guide to integrating Anthropic's Claude API into a Node.js backend. Covers streaming responses, tool use (function calling), prompt caching, and production best practices.",
+      "author": {
+        "@type": "Person",
+        "name": "Jenil Narola",
+        "url": "https://jenilnarola.ca",
+        "jobTitle": "Full Stack & AI Developer"
+      },
+      "datePublished": "2026-06-11",
+      "dateModified": "2026-06-11",
+      "publisher": { "@type": "Person", "name": "Jenil Narola", "url": "https://jenilnarola.ca" },
+      "url": "https://jenilnarola.ca/articles/claude-api-nodejs-streaming-tool-use.html",
+      "mainEntityOfPage": "https://jenilnarola.ca/articles/claude-api-nodejs-streaming-tool-use.html",
+      "keywords": ["Claude API", "Anthropic", "Node.js", "Streaming", "Tool Use", "Prompt Caching", "AI Integration", "LLM"]
+    }
+    </script>
+
+    <style>
+        body { background: #2b2b35; color: rgba(255,255,255,0.78); font-family: 'DM Sans', sans-serif; }
+        .art-article-nav { background: #35353f; padding: 14px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .art-article-nav a { color: #F1B608; text-decoration: none; font-size: 0.9rem; }
+        .art-article-nav a:hover { text-decoration: underline; }
+        .art-article-wrap { max-width: 820px; margin: 0 auto; padding: 50px 24px 80px; }
+        .art-article-header { margin-bottom: 40px; }
+        .art-article-header h1 { font-size: 2rem; color: #fff; line-height: 1.35; margin-bottom: 14px; }
+        .art-article-meta { font-size: 0.82rem; color: rgba(255,255,255,0.45); }
+        .art-article-meta span { margin-right: 18px; }
+        .art-article-meta i { margin-right: 5px; color: #F1B608; }
+        h2 { font-size: 1.3rem; color: #fff; margin-top: 40px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        h3 { font-size: 1.05rem; color: rgba(255,255,255,0.9); margin-top: 28px; margin-bottom: 10px; }
+        p { line-height: 1.8; margin-bottom: 16px; }
+        pre { background: #1a1a24; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 20px 0; }
+        code { font-family: 'Courier New', monospace; font-size: 0.875rem; color: #e8c96d; }
+        pre code { color: rgba(255,255,255,0.82); }
+        .inline-code { background: #1a1a24; border-radius: 3px; padding: 2px 7px; font-family: monospace; font-size: 0.875em; color: #e8c96d; }
+        ul, ol { line-height: 1.9; padding-left: 22px; margin-bottom: 16px; }
+        .art-tag { display: inline-block; background: rgba(241,182,8,0.12); color: #F1B608; border-radius: 4px; padding: 2px 10px; font-size: 0.78rem; margin-right: 6px; margin-bottom: 6px; }
+        .art-callout { background: rgba(241,182,8,0.08); border-left: 3px solid #F1B608; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 24px 0; }
+        .art-callout p { margin-bottom: 0; }
+        .art-savings { background: rgba(74,222,128,0.08); border-left: 3px solid #4ade80; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 24px 0; }
+        .art-savings p { margin-bottom: 0; color: #4ade80; }
+        footer { text-align: center; padding: 30px; font-size: 0.82rem; color: rgba(255,255,255,0.35); border-top: 1px solid rgba(255,255,255,0.06); }
+        footer a { color: #F1B608; }
+    </style>
+</head>
+<body>
+
+<nav class="art-article-nav">
+    <a href="https://jenilnarola.ca"><i class="fas fa-arrow-left"></i> Back to Portfolio</a>
+    <a href="mailto:jenilnarola@gmail.com"><i class="fas fa-envelope"></i> Hire Me</a>
+</nav>
+
+<div class="art-article-wrap">
+
+    <div class="art-article-header">
+        <div style="margin-bottom:14px;">
+            <span class="art-tag">Claude API</span>
+            <span class="art-tag">Anthropic</span>
+            <span class="art-tag">Node.js</span>
+            <span class="art-tag">Streaming</span>
+            <span class="art-tag">Tool Use</span>
+            <span class="art-tag">Prompt Caching</span>
+        </div>
+        <h1>Claude AI API in Node.js: Streaming, Tool Use & Prompt Caching</h1>
+        <div class="art-article-meta">
+            <span><i class="fas fa-user"></i> Jenil Narola</span>
+            <span><i class="fas fa-calendar"></i> June 11, 2026</span>
+            <span><i class="fas fa-clock"></i> 9 min read</span>
+        </div>
+    </div>
+
+    <p>Anthropic's Claude is one of the most capable LLMs available today, with a 200K token context window, strong instruction following, and unique features like <strong>prompt caching</strong> and <strong>extended thinking</strong>. In this guide I'll show how to integrate Claude into a Node.js backend with streaming responses, tool use (function calling), and prompt caching — the three features that matter most in production.</p>
+
+    <h2>1. Install the Anthropic SDK</h2>
+    <pre><code>npm install @anthropic-ai/sdk</code></pre>
+
+    <p>Set your API key in <span class="inline-code">.env</span>:</p>
+    <pre><code>ANTHROPIC_API_KEY=sk-ant-...</code></pre>
+
+    <h2>2. Basic Message</h2>
+    <pre><code>import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+const message = await client.messages.create({
+  model: "claude-sonnet-4-6",
+  max_tokens: 1024,
+  messages: [
+    { role: "user", content: "Explain REST vs GraphQL in 3 sentences." }
+  ],
+});
+
+console.log(message.content[0].text);</code></pre>
+
+    <h2>3. Streaming Responses</h2>
+    <p>Streaming is essential for chat UIs — users see text appear immediately rather than waiting for the full response. Claude streams using Server-Sent Events (SSE).</p>
+    <pre><code>import express from "express";
+const app = express();
+app.use(express.json());
+
+app.post("/chat", async (req, res) => {
+  const { message } = req.body;
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const stream = client.messages.stream({
+    model: "claude-sonnet-4-6",
+    max_tokens: 2048,
+    system: "You are a helpful assistant.",
+    messages: [{ role: "user", content: message }],
+  });
+
+  stream.on("text", (text) => {
+    res.write(`data: ${JSON.stringify({ text })}\n\n`);
+  });
+
+  stream.on("message", () => {
+    res.write("data: [DONE]\n\n");
+    res.end();
+  });
+
+  stream.on("error", (err) => {
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+    res.end();
+  });
+});</code></pre>
+
+    <div class="art-callout">
+        <p><strong>Frontend consumption:</strong> Use the browser's <span class="inline-code">EventSource</span> API or <span class="inline-code">fetch</span> with <span class="inline-code">ReadableStream</span> to consume the SSE stream and append text tokens to the UI in real time.</p>
+    </div>
+
+    <h2>4. Tool Use (Function Calling)</h2>
+    <p>Tool use lets Claude call your own functions — database lookups, API calls, calculations — and incorporate the results into its response. This is how you build reliable AI features that operate on live data.</p>
+    <pre><code>const tools = [
+  {
+    name: "get_order_status",
+    description: "Get the current status of a customer order by order ID.",
+    input_schema: {
+      type: "object",
+      properties: {
+        order_id: {
+          type: "string",
+          description: "The order ID to look up, e.g. ORD-12345"
+        }
+      },
+      required: ["order_id"]
+    }
+  }
+];
+
+async function getOrderStatus(orderId) {
+  // your real database call here
+  return { orderId, status: "shipped", estimatedDelivery: "2026-06-14" };
+}
+
+async function chatWithTools(userMessage) {
+  const messages = [{ role: "user", content: userMessage }];
+
+  while (true) {
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1024,
+      tools,
+      messages,
+    });
+
+    if (response.stop_reason === "end_turn") {
+      return response.content.find(b => b.type === "text")?.text;
+    }
+
+    if (response.stop_reason === "tool_use") {
+      messages.push({ role: "assistant", content: response.content });
+
+      const toolResults = [];
+      for (const block of response.content) {
+        if (block.type === "tool_use") {
+          let result;
+          if (block.name === "get_order_status") {
+            result = await getOrderStatus(block.input.order_id);
+          }
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: block.id,
+            content: JSON.stringify(result),
+          });
+        }
+      }
+
+      messages.push({ role: "user", content: toolResults });
+    }
+  }
+}
+
+// Usage
+const answer = await chatWithTools("Where is my order ORD-98765?");
+console.log(answer);
+// "Your order ORD-98765 has been shipped and is estimated to arrive on June 14, 2026."</code></pre>
+
+    <h2>5. Prompt Caching</h2>
+    <p>Prompt caching is Claude's most impactful cost-saving feature. When you mark content with <span class="inline-code">cache_control</span>, Anthropic caches that prefix for 5 minutes. Subsequent requests that hit the cache are <strong>90% cheaper and up to 85% faster</strong> for the cached portion.</p>
+
+    <div class="art-savings">
+        <p><strong>Cost impact:</strong> A 10,000-token system prompt costs $0.03 uncached per request. With caching at 100 req/min, that's $1.80/min → $2,592/day. With cache hits, it drops to ~$0.003/min → ~$4.32/day.</p>
+    </div>
+
+    <pre><code>const response = await client.messages.create({
+  model: "claude-sonnet-4-6",
+  max_tokens: 1024,
+  system: [
+    {
+      type: "text",
+      text: `You are an expert customer support agent for Acme Corp.
+
+      ## Product Catalog
+      ${largeProductCatalogText}  // could be 50,000+ tokens
+
+      ## Policies
+      ${detailedPoliciesText}`,
+      cache_control: { type: "ephemeral" }  // cache this prefix
+    }
+  ],
+  messages: [
+    { role: "user", content: userQuestion }  // only this changes per request
+  ],
+});</code></pre>
+
+    <div class="art-callout">
+        <p><strong>Caching rules:</strong> Cache breakpoints must be stable across requests. The cached prefix is everything up to and including the <span class="inline-code">cache_control</span> block. Only the content after the breakpoint is processed fresh.</p>
+    </div>
+
+    <h2>6. Multi-turn Conversation with History</h2>
+    <pre><code>// In-memory store — use Redis in production
+const sessions = new Map();
+
+app.post("/chat/:sessionId", async (req, res) => {
+  const { sessionId } = req.params;
+  const { message } = req.body;
+
+  const history = sessions.get(sessionId) || [];
+  history.push({ role: "user", content: message });
+
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 2048,
+    system: [{ type: "text", text: "You are a helpful assistant.", cache_control: { type: "ephemeral" } }],
+    messages: history,
+  });
+
+  const assistantMessage = response.content[0].text;
+  history.push({ role: "assistant", content: assistantMessage });
+
+  // Keep last 20 turns to avoid context overflow
+  if (history.length > 40) history.splice(0, 2);
+  sessions.set(sessionId, history);
+
+  res.json({ reply: assistantMessage });
+});</code></pre>
+
+    <h2>Production Best Practices</h2>
+    <ul>
+        <li><strong>Never expose your API key to the frontend.</strong> All Claude calls must go through your backend.</li>
+        <li><strong>Set a max_tokens budget.</strong> Without it, a runaway response can drain credits. Set it based on expected response length.</li>
+        <li><strong>Handle rate limits.</strong> Wrap calls in a retry with exponential backoff when you receive a 429 status.</li>
+        <li><strong>Log input/output tokens</strong> from <span class="inline-code">response.usage</span> per request to track costs per user.</li>
+        <li><strong>Use the latest Sonnet model</strong> (<span class="inline-code">claude-sonnet-4-6</span>) as the default — best balance of capability and cost. Reserve Opus for tasks that genuinely need it.</li>
+        <li><strong>Validate tool inputs.</strong> Claude is reliable but treat tool inputs as untrusted — validate before hitting your database or APIs.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>Streaming, tool use, and prompt caching are the three features that distinguish a toy Claude integration from a production-grade one. Streaming keeps UX responsive. Tool use grounds Claude in your real data. Prompt caching cuts API costs by orders of magnitude at scale. Together they let you build AI features that are fast, accurate, and economically viable.</p>
+
+    <p>Building an AI-powered product on Claude or OpenAI? <a href="mailto:jenilnarola@gmail.com" style="color:#F1B608;">Get in touch</a> or <a href="https://www.upwork.com/freelancers/~01847efbf9829d2ab3" target="_blank" style="color:#F1B608;">hire me on Upwork</a>.</p>
+
+</div>
+
+<footer>
+    <p>Written by <a href="https://jenilnarola.ca">Jenil Narola</a> — Full Stack & AI Developer, Toronto, ON · <a href="https://jenilnarola.ca">View Portfolio</a></p>
+</footer>
+
+</body>
+</html>
